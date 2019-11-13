@@ -55,6 +55,29 @@ const Note = {
 		noteElement.addEventListener('drop', Note.drop)
 	},
 
+	// Функция создает новые карточки.
+	create () {
+		// Создать новую карточку для колонки.
+		const noteElement = document.createElement('div')
+		/*
+			Добавить в неё содержимое, которое должно в ней быть
+			(классы, HTML-атрибуты).
+		*/
+		noteElement.classList.add('note')
+		// Атрибут draggable указывает, что элемент можно перетаскивать.
+		noteElement.setAttribute('draggable', 'true')
+		noteElement.setAttribute('data-note-id', Note.idCounter)
+
+		Note.idCounter++
+		/*
+			Добавить вновь созданной карточке
+			обработчики событий "Двойной клик" и "Потеря фокуса".
+		*/
+		Note.process(noteElement)
+
+		return noteElement
+	},
+
 	dragstart (event) {
 		// console.log('dragstart', event, this)
 
@@ -105,9 +128,10 @@ const Note = {
 		event.preventDefault()
 		/*
 			Сделать так, чтобы текущее событие не срабатывало,
-			когда перетаскиваемая карточка находится сама над собой.
+			когда перетаскиваемая карточка находится сама над собой,
+			и когда над карточкой перетаскивается колонка, а не карточка.
 		*/
-		if (this === Note.dragged) {
+		if (!Note.dragged || this === Note.dragged) {
 			return
 		}
 	},
@@ -115,9 +139,10 @@ const Note = {
 	dragleave (event) {
 		/*
 			Сделать так, чтобы текущее событие не срабатывало,
-			когда перетаскиваемая карточка находится сама над собой.
+			когда перетаскиваемая карточка находится сама над собой,
+			и когда над карточкой перетаскивается колонка, а не карточка.
 		*/
-		if (this === Note.dragged) {
+		if (!Note.dragged || this === Note.dragged) {
 			return
 		}
 
@@ -133,9 +158,10 @@ const Note = {
 		event.stopPropagation()
 		/*
 			Сделать так, чтобы текущее событие не срабатывало,
-			когда перетаскиваемая карточка находится сама над собой.
+			когда перетаскиваемая карточка находится сама над собой,
+			и когда над карточкой перетаскивается колонка, а не карточка.
 		*/
-		if (this === Note.dragged) {
+		if (!Note.dragged || this === Note.dragged) {
 			return
 		}
 
