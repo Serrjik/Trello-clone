@@ -5,6 +5,9 @@ const Column = {
 	// Ссылка на перетаскиваемый элемент.
 	dragged: null,
 
+	// Ссылка на элемент, над которым произошло бросание перетаскиваемого.
+	dropped:  null,
+
 	// Метод обрабатывает колонки, кнопку "+ Добавить карточку".
 	process (columnElement) {
 		// Найти кнопку "+ Добавить карточку"
@@ -46,15 +49,15 @@ const Column = {
 		// Повесить обработчик события dragend колонке.
 		columnElement.addEventListener('dragend', Column.dragend)
 
-		// Повесить обработчик события dragenter колонке.
-		columnElement.addEventListener('dragenter', Column.dragenter)
-		// // Повесить обработчик события dragover колонке.
-		// columnElement.addEventListener('dragover', Column.dragover)
-		// Повесить обработчик события dragleave колонке.
-		columnElement.addEventListener('dragleave', Column.dragleave)
-
-		//terСделать так, чтобы карточки можно было перетаскивать и на пустые колонки.
+		// // Повесить обработчик события dragenter колонке.
+		// columnElement.addEventListener('dragenter', Column.dragenter)
+		/*
+			Повесить обработчик события dragover колонке, чтобы
+			сделать так, чтобы карточки можно было перетаскивать и на пустые колонки.
+		*/
 		columnElement.addEventListener('dragover', Column.dragover)
+		// // Повесить обработчик события dragleave колонке.
+		// columnElement.addEventListener('dragleave', Column.dragleave)
 
 		// Сделать так, чтобы карточки можно было перетаскивать и на пустые колонки.
 		columnElement.addEventListener('drop', Column.drop)
@@ -83,6 +86,8 @@ const Column = {
 		Column.dragged.classList.remove('dragged')
 		// Забыть, какой элемент перетаскивается.
 		Column.dragged = null
+		// Забыть, над каким элементом произошло бросание.
+		Column.dropped = null
 
 		// Добавить свойство draggable всем карточкам.
 		document
@@ -90,38 +95,38 @@ const Column = {
 			.forEach(noteElement => noteElement.setAttribute('draggable', 'true'))
 	},
 
-	dragenter (event) {
-		/*
-			Не обрабатывать перемещение колонки над самой собой,
-			либо перемещение не колонки (перемещаемая колонка отсутствует).
-		*/
-		if (!Column.dragged || Column.dragged === this) {
-			return
-		}
+	// dragenter (event) {
+	// 	/*
+	// 		Не обрабатывать перемещение колонки над самой собой,
+	// 		либо перемещение не колонки (перемещаемая колонка отсутствует).
+	// 	*/
+	// 	if (!Column.dragged || Column.dragged === this) {
+	// 		return
+	// 	}
 
-		// Добавить класс under тем колонкам, над которыми перетаскивают колонку.
-		this.classList.add('under')
+	// 	// Добавить класс under тем колонкам, над которыми перетаскивают колонку.
+	// 	this.classList.add('under')
 
-		console.log('dragenter')
-	},
+	// 	console.log('+')
+	// },
 
-	dragleave (event) {
-		/*
-			Не обрабатывать перемещение колонки над самой собой,
-			либо перемещение не колонки (перемещаемая колонка отсутствует).
-		*/
-		if (!Column.dragged || Column.dragged === this) {
-			return
-		}
+	// dragleave (event) {
+	// 	/*
+	// 		Не обрабатывать перемещение колонки над самой собой,
+	// 		либо перемещение не колонки (перемещаемая колонка отсутствует).
+	// 	*/
+	// 	if (!Column.dragged || Column.dragged === this) {
+	// 		return
+	// 	}
 
-		/*
-			Убрать класс under у тех колонок,
-			над которыми уже убрали перетаскиваемую колонку.
-		*/
-		this.classList.remove('under')
+	// 	/*
+	// 		Убрать класс under у тех колонок,
+	// 		над которыми уже убрали перетаскиваемую колонку.
+	// 	*/
+	// 	this.classList.remove('under')
 
-		console.log('dragleave')
-	},
+	// 	console.log('-')
+	// },
 
 	dragover (event) {
 		/*
@@ -129,6 +134,21 @@ const Column = {
 			потому что это событие будет отслеживаться программно.
 		*/
 		event.preventDefault()
+		event.stopPropagation()
+
+		// Если текущая колонка является перетаскиваемой:
+		if (Column.dragged === this) {
+			/*
+				Если уже есть колонка, над которой бросили элемент
+				убрать у неё класс under.
+			*/
+			if (Column.dropped) {
+				Column.dropped.classList.remove('under')
+			}
+			// Не будет элемента, над которым можно бросить карточку.
+			Column.dropped = null
+		}
+
 		/*
 			Не обрабатывать перемещение колонки над самой собой,
 			либо перемещение не колонки (перемещаемая колонка отсутствует).
@@ -137,7 +157,16 @@ const Column = {
 			return
 		}
 
-		console.log('dragover')
+		// Элемент, над которым бросили перетаскиваемую карточку.
+		Column.dropped = this
+
+		// Удалить для всех колонок класс under.
+		document
+			.querySelectorAll('.column')
+			.forEach(columnElement => columnElement.classList.remove('under'))
+
+		// Колонке, над которой бросили перетаскиваемую карточку, присвоить класс under.
+		this.classList.add('under')
 	},
 
 	drop () {
@@ -147,7 +176,32 @@ const Column = {
 		}
 		// Если бросается перетаскиваемая колонка:
 		else if (Column.dragged) {
-			console.log('drop column')
+			// Найдем все колонки в DOM-дереве и преобразуем в массив.
+			const children = Array.from(document.querySelector('.columns').children)
+			// Найти порядковой номер колонки, на которую бросили.
+			const indexA = children.indexOf(this)
+			// Найти порядковой номер колонки, которую перетаскивают.
+			const indexB = children.indexOf(Column.dragged)
+
+			if (indexA < indexB) {
+				/*
+					Вставить элемент, который переносили,
+					перед тем элементом, над которым бросили.
+				*/
+				document.querySelector('.columns').insertBefore(Column.dragged, this)
+			}
+			else {
+				/*
+					Вставить элемент, который переносили,
+					перед следующим соседом того элемента, над которым бросили.
+				*/
+				document.querySelector('.columns').insertBefore(Column.dragged, this.nextElementSibling)
+			}
+			
+			// Удалить для всех колонок класс under.
+			document
+				.querySelectorAll('.column')
+				.forEach(columnElement => columnElement.classList.remove('under'))
 		}
 	}
 }
