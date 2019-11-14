@@ -68,6 +68,11 @@ const Column = {
 
 		// Отменить всплытие текущего события.
 		event.stopPropagation()
+
+		// Отменить свойство draggable у всех карточек.
+		document
+			.querySelectorAll('.note')
+			.forEach(noteElement => noteElement.removeAttribute('draggable'))
 	},
 
 	dragend (event) {
@@ -78,6 +83,11 @@ const Column = {
 		Column.dragged.classList.remove('dragged')
 		// Забыть, какой элемент перетаскивается.
 		Column.dragged = null
+
+		// Добавить свойство draggable всем карточкам.
+		document
+			.querySelectorAll('.note')
+			.forEach(noteElement => noteElement.setAttribute('draggable', 'true'))
 	},
 
 	dragenter (event) {
@@ -88,6 +98,9 @@ const Column = {
 		if (!Column.dragged || Column.dragged === this) {
 			return
 		}
+
+		// Добавить класс under тем колонкам, над которыми перетаскивают колонку.
+		this.classList.add('under')
 
 		console.log('dragenter')
 	},
@@ -100,6 +113,12 @@ const Column = {
 		if (!Column.dragged || Column.dragged === this) {
 			return
 		}
+
+		/*
+			Убрать класс under у тех колонок,
+			над которыми уже убрали перетаскиваемую колонку.
+		*/
+		this.classList.remove('under')
 
 		console.log('dragleave')
 	},
