@@ -63,5 +63,38 @@ const Application = {
 	},
 
 	// Функция загружает состояние приложения.
-	load () {}
+	load () {
+		// Если нет сохранения приложения, завершить работу функции.
+		if (!localStorage.getItem('trello')) {
+			return
+		}
+
+		// Очистить контейнер для колонок.
+		const mountPoint = document.querySelector('.columns')
+		mountPoint.innerHTML = ''
+
+		// Если есть сохраненные данные, десериализовать.
+		const object = JSON.parse(localStorage.getItem('trello'))
+		// Функция возвращает карточку по id.
+		const getNoteById = id => object.notes.items.find(note => note.id === id)
+
+		// Пройти по всем колонкам.
+		for (const column of object.columns.items) {
+			// Создать колонку.
+			const columnElement = Column.create(column.id)
+
+			// Вставить колонку в контейнер для колонок.
+			mountPoint.append(columnElement)
+
+			// Пройти по всем карточкам.
+			for (const noteId of column.noteIds) {
+				// Найти карточку по noteId.
+				const note = getNoteById(noteId)
+
+				const noteElement = Note.create(note.id, note.content)
+				// Вставить карточку в колонку.
+				columnElement.querySelector('[data-notes]').append(noteElement)
+			}
+		}
+	}
 }

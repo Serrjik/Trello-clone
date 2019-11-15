@@ -56,7 +56,7 @@ const Note = {
 	},
 
 	// Функция создает новые карточки.
-	create () {
+	create (id = null, content = '') {
 		// Создать новую карточку для колонки.
 		const noteElement = document.createElement('div')
 		/*
@@ -66,9 +66,18 @@ const Note = {
 		noteElement.classList.add('note')
 		// Атрибут draggable указывает, что элемент можно перетаскивать.
 		noteElement.setAttribute('draggable', 'true')
-		noteElement.setAttribute('data-note-id', Note.idCounter)
+		noteElement.textContent = content
 
-		Note.idCounter++
+		// Если передан id (сохраненная карточка создается из функции load):
+		if (id) {
+			noteElement.setAttribute('data-note-id', id)
+		}
+		// Если не передан id (создается новая карточка):
+		else {
+			noteElement.setAttribute('data-note-id', Note.idCounter)
+			Note.idCounter++
+		}
+
 		/*
 			Добавить вновь созданной карточке
 			обработчики событий "Двойной клик" и "Потеря фокуса".

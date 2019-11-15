@@ -63,6 +63,42 @@ const Column = {
 		columnElement.addEventListener('drop', Column.drop)
 	},
 
+	create (id = null) {
+		// Создать новую колонку.
+		const columnElement = document.createElement('div')
+		/*
+			Добавить в неё содержимое, которое должно в ней быть
+			(классы, HTML-атрибуты).
+		*/
+		columnElement.classList.add('column')
+		columnElement.setAttribute('draggable', 'true')
+
+		// Если передают id (восстановить колонку из сохранения):
+		if (id) {
+			columnElement.setAttribute('data-column-id', id)
+		}
+		// Если не передают id (создают новую колонку):
+		else {
+			columnElement.setAttribute('data-column-id', Column.idCounter)
+			Column.idCounter++
+		}
+
+		// Создать содержимое колонки.
+		columnElement.innerHTML = 
+`<p class="column-header">В плане</p>
+<div data-notes></div>
+<p class="column-footer">
+	<span data-action-addNote class="action">+ Добавить карточку</span>
+</p>`
+		/*
+			Сделать действие над созданной колонкой
+			(повесить обработчик кнопке "+ Добавить карточку").
+		*/
+		Column.process(columnElement)
+
+		return columnElement
+	},
+
 	dragstart (event) {
 		// Запомнить, какой элемент перетаскивается.
 		Column.dragged = this
