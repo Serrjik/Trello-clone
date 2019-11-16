@@ -81,21 +81,21 @@ console.log(object)
 		const getNoteById = id => object.notes.items.find(note => note.id === id)
 
 		// Пройти по всем колонкам.
-		for (const column of object.columns.items) {
+		for (const { id, title, noteIds } of object.columns.items) {
 			// Создать колонку.
-			const columnElement = Column.create(column.id, column.title)
+			const column = new Column(id, title)
 
 			// Вставить колонку в контейнер для колонок.
-			mountPoint.append(columnElement)
+			mountPoint.append(column.element)
 
 			// Пройти по всем карточкам.
-			for (const noteId of column.noteIds) {
+			for (const noteId of noteIds) {
 				// Найти карточку по noteId.
-				const note = getNoteById(noteId)
+				const { id, content } = getNoteById(noteId)
 
-				const noteElement = Note.create(note.id, note.content)
+				const note = new Note(id, content)
 				// Вставить карточку в колонку.
-				columnElement.querySelector('[data-notes]').append(noteElement)
+				column.element.querySelector('[data-notes]').append(note.element)
 			}
 		}
 	}
