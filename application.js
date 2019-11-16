@@ -1,6 +1,6 @@
 // Модуль реализует сериализацию и десериализацию данных.
 const Application = {
-	// Функция сохраняет состояние приложения.
+	// Функция сохраняет состояние приложения в localStorage.
 	save () {
 		// Объект для сохранения.
 		const object = {
@@ -21,6 +21,8 @@ const Application = {
 			.querySelectorAll('.column')
 			.forEach(columnElement => {
 				const column = {
+					// Заголовок колонки.
+					title: columnElement.querySelector('.column-header').textContent,
 					id: parseInt(columnElement.getAttribute('data-column-id')),
 					noteIds: []
 				}
@@ -51,7 +53,7 @@ const Application = {
 				// Добавить элемент карточки в массив всех карточек.
 				object.notes.items.push(note)
 			})
-
+console.log(object)
 		// Сериализация объекта для сохранения.
 		const json = JSON.stringify(object)
 
@@ -62,7 +64,7 @@ const Application = {
 		// return object
 	},
 
-	// Функция загружает состояние приложения.
+	// Функция загружает состояние приложения из localStorage.
 	load () {
 		// Если нет сохранения приложения, завершить работу функции.
 		if (!localStorage.getItem('trello')) {
@@ -81,7 +83,7 @@ const Application = {
 		// Пройти по всем колонкам.
 		for (const column of object.columns.items) {
 			// Создать колонку.
-			const columnElement = Column.create(column.id)
+			const columnElement = Column.create(column.id, column.title)
 
 			// Вставить колонку в контейнер для колонок.
 			mountPoint.append(columnElement)

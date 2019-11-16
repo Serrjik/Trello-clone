@@ -42,6 +42,9 @@ const Column = {
 		headerElement.addEventListener('blur', function (event) {
 			// Сделать элемент нередактируемым.
 			headerElement.removeAttribute('contenteditable')
+
+			// Сохранить состояние приложения в localStorage().
+			Application.save()
 		})
 
 		// Повесить обработчик события dragstart колонке.
@@ -63,7 +66,7 @@ const Column = {
 		columnElement.addEventListener('drop', Column.drop)
 	},
 
-	create (id = null) {
+	create (id = null, title) {
 		// Создать новую колонку.
 		const columnElement = document.createElement('div')
 		/*
@@ -85,7 +88,7 @@ const Column = {
 
 		// Создать содержимое колонки.
 		columnElement.innerHTML = 
-`<p class="column-header">В плане</p>
+`<p class="column-header">Новая колонка</p>
 <div data-notes></div>
 <p class="column-footer">
 	<span data-action-addNote class="action">+ Добавить карточку</span>
@@ -94,7 +97,12 @@ const Column = {
 			Сделать действие над созданной колонкой
 			(повесить обработчик кнопке "+ Добавить карточку").
 		*/
-		Column.process(columnElement)
+		Column.process(columnElement, title)
+
+		// Найти заголовок созданной колонки.
+		const headerElement = columnElement.querySelector('.column-header')
+		// Восстановить заголовок созданной колонки из сохранения.
+		headerElement.textContent = title
 
 		return columnElement
 	},
@@ -129,6 +137,9 @@ const Column = {
 		document
 			.querySelectorAll('.note')
 			.forEach(noteElement => noteElement.setAttribute('draggable', 'true'))
+
+		// Сохранить состояние приложения в localStorage().
+		Application.save()
 	},
 
 	// dragenter (event) {

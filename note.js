@@ -39,6 +39,9 @@ const Note = {
 			if (!noteElement.textContent.trim().length) {
 				noteElement.remove()
 			}
+
+			// Сохранить состояние приложения в localStorage().
+			Application.save()
 		})
 
 		// Событие dragstart для карточки, которую перетаскивают.
@@ -119,6 +122,9 @@ const Note = {
 		document
 			.querySelectorAll('.note')
 			.forEach(x => x.classList.remove('under'))
+
+		// Сохранить состояние приложения в localStorage().
+		Application.save()
 	},
 
 	dragenter (event) {
