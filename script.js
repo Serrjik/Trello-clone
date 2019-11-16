@@ -21,10 +21,10 @@ document
 			затем вставить это всё на страницу.
 		*/
 		// Создать колонку.
-		const columnElement = Column.create()
+		const columnElement = new Column
 
 		// Вставить колонку в элемент, в котором содержатся все колонки.
-		document.querySelector('.columns').append(columnElement)
+		document.querySelector('.columns').append(columnElement.element)
 
 		// После создания новой колонки сохранить состояние приложения в localStorage.
 		Application.save()

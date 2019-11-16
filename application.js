@@ -79,7 +79,7 @@ console.log(object)
 		const object = JSON.parse(localStorage.getItem('trello'))
 		// Функция возвращает карточку по id.
 		const getNoteById = id => object.notes.items.find(note => note.id === id)
-
+console.log(object)
 		// Пройти по всем колонкам.
 		for (const { id, title, noteIds } of object.columns.items) {
 			// Создать колонку.
@@ -95,7 +95,8 @@ console.log(object)
 
 				const note = new Note(id, content)
 				// Вставить карточку в колонку.
-				column.element.querySelector('[data-notes]').append(note.element)
+				column.add(note)
+				// column.element.querySelector('[data-notes]').append(note.element)
 			}
 		}
 	}

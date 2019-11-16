@@ -1,6 +1,15 @@
 // Класс отвечает за обработку колонок.
 class Column {
 	constructor (id = null, title) {
+		/*
+			Для обращения к родительскому контексту в функции,
+			которая не поддерживает this.
+		*/
+		const instance = this
+
+		// Дочерние карточки.
+		this.notes = []
+
 		// Создать новую колонку.
 		const element = this.element = document.createElement('div')
 		/*
@@ -37,15 +46,18 @@ class Column {
 		// Добавить этой кнопке обработчик события "Click" - создать новую карточку.
 		spanAction_addNote.addEventListener('click', function (event) {
 			// Создать карточку.
-			const noteElement = Note.create()
+			const note = new Note
+			// instance хранит родительский контекст.
+			instance.add(note)
+
 			// Вставить созданную карточку в конец колонки.
-			element.querySelector('[data-notes]').append(noteElement)
+			element.querySelector('[data-notes]').append(note.element)
 			/*
 				Чтобы вновь созданную карточку сразу же можно было редактировать,
 				добавить ей атрибут contenteditable и передать фокус.
 			*/
-			noteElement.setAttribute('contenteditable', 'true')
-			noteElement.focus()
+			note.element.setAttribute('contenteditable', 'true')
+			note.element.focus()
 		})
 
 		// Найти заголовок колонки.
@@ -100,6 +112,26 @@ class Column {
 		}
 	}
 
+	/*
+		Метод добавляет карточки в колонку.
+		Добавляет в notes нужные данные и размещает карточки в вёрстке.
+	*/
+	add (...notes) {
+		// Пройти по всем заметкам, которые пришли в метод.
+		for (const note of notes) {
+			// Если они отсутствуют в списке, добавить!
+			if (!this.notes.includes(note)) {
+				this.notes.push(note)
+
+				/*
+					Также добавить отсутствующие карточки
+					в конец списка элементов в вёрстке.
+				*/
+				this.element.querySelector('[data-notes]').append(note.element)
+			}
+		}
+	}
+
 	dragstart (event) {
 		// Запомнить, какой элемент перетаскивается.
 		Column.dragged = this.element
@@ -128,8 +160,13 @@ class Column {
 
 		// Добавить свойство draggable всем карточкам.
 		document
-		.querySelectorAll('.note')
-		.forEach(noteElement => noteElement.setAttribute('draggable', 'true'))
+			.querySelectorAll('.note')
+			.forEach(noteElement => noteElement.setAttribute('draggable', 'true'))
+
+		// Удалить для всех колонок класс under.
+		document
+			.querySelectorAll('.column')
+			.forEach(columnElement => columnElement.classList.remove('under'))
 
 		// Сохранить состояние приложения в localStorage().
 		Application.save()
@@ -214,7 +251,7 @@ class Column {
 }
 
 // Здесь хранится ID следующей создаваемой колонки (поле принадлежит классу).
-Column.idCounter = 4
+Column.idCounter = 1
 // Ссылка на перетаскиваемый элемент (поле принадлежит классу).
 Column.dragged = null
 /*
