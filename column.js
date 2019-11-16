@@ -99,10 +99,13 @@ const Column = {
 		*/
 		Column.process(columnElement, title)
 
-		// Найти заголовок созданной колонки.
-		const headerElement = columnElement.querySelector('.column-header')
-		// Восстановить заголовок созданной колонки из сохранения.
-		headerElement.textContent = title
+		// Если заголовок колонки существует (колонка восстанавливается из сохранения):
+		if (title) {
+			// Найти заголовок созданной колонки.
+			const headerElement = columnElement.querySelector('.column-header')
+			// Восстановить заголовок созданной колонки из сохранения.
+			headerElement.textContent = title
+		}
 
 		return columnElement
 	},
