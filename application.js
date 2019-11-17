@@ -77,6 +77,12 @@ console.log(object)
 
 		// Если есть сохраненные данные, десериализовать.
 		const object = JSON.parse(localStorage.getItem('trello'))
+
+		// Восстановить ID следующей создаваемой колонки из сохранения.
+		Column.idCounter = object.columns.idCounter
+		// Восстановить ID следующей создаваемой карточки из сохранения.
+		Note.idCounter = object.notes.idCounter
+
 		// Функция возвращает карточку по id.
 		const getNoteById = id => object.notes.items.find(note => note.id === id)
 console.log(object)
