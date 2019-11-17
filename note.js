@@ -2,6 +2,12 @@
 class Note {
 	constructor (id = null, content = '') {
 		/*
+			Для обращения к родительскому контексту в функции,
+			которая не поддерживает this.
+		*/
+		const instance = this
+
+		/*
 			Создать новую карточку для колонки
 			(this.element - представление элемента в DOM-дереве).
 		*/
@@ -36,8 +42,7 @@ class Note {
 			// При редактировании карточки сделать карточку неперетаскиваемой.
 			element.removeAttribute('draggable')
 			// При редактировании карточки сделать родительскую колонку неперетаскиваемой.
-			// closest - поиск элемента вверх по иерархии (по родительским элементам).
-			element.closest('.column').removeAttribute('draggable')
+			instance.column.removeAttribute('draggable')
 			// Передать фокус элементу.
 			element.focus()
 		})
@@ -50,8 +55,7 @@ class Note {
 			// Сделать карточку обратно перетаскиваемой.
 			element.setAttribute('draggable', 'true')
 			// Сделать родительскую колонку обратно перетаскиваемой.
-			// closest - поиск элемента вверх по иерархии (по родительским элементам).
-			element.closest('.column').setAttribute('draggable', 'true')
+			instance.column.setAttribute('draggable', 'true')
 
 			// Если карточка пустая, удалить её!
 			if (!element.textContent.trim().length) {
@@ -79,6 +83,12 @@ class Note {
 		element.addEventListener('dragleave', this.dragleave.bind(this))
 		// Событие drop для карточки, над которой водят.
 		element.addEventListener('drop', this.drop.bind(this))
+	}
+
+	// Возвращает колонку-родитель элемента.
+	get column () {
+		// closest - поиск элемента вверх по иерархии (по родительским элементам).
+		return this.element.closest('.column')
 	}
 
 	dragstart (event) {
